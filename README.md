@@ -1,2 +1,2 @@
-# osl_models
-Models for Gazebo simulation 
+# osl_simulator
+Wrapper for launching simulated missions.
