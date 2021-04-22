@@ -11,9 +11,9 @@ from tf.transformations import euler_from_quaternion, euler_matrix
 
 from sensor_msgs.msg import Image
 from vision_msgs.msg import Detection2D
-from gazebo_bbox.msg import Box2DArray
-from gazebo_msgs.msg import ModelStates
 from geometry_msgs.msg import Pose
+from gazebo_msgs.msg import ModelStates
+from osl_simulator.msg import Box2DArray
 
 np.set_printoptions(precision=4, suppress=True)
 

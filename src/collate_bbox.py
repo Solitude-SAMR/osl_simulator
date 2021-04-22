@@ -4,7 +4,7 @@ import numpy as np
 
 from vision_msgs.msg import Detection2D
 from vision_msgs.msg import BoundingBox2D
-from gazebo_bbox.msg import Box2DArray
+from osl_simulator.msg import Box2DArray
 
 class CollateBoxes():
     def __init__(self):

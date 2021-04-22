@@ -1,0 +1,34 @@
+<launch>
+    <arg name="gui" default="true"/>
+    <arg name="paused" default="false"/>
+    <arg name="extra_gazebo_args" default=""/>  
+
+    <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <!-- Edit the name of the world file (example_underwater.world) when using this template -->
+        <arg name="world_name" value="worlds/wavetank.world"/>
+        <!-- <arg name="world_name" value="worlds/dataset.world"/> -->
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+        <arg name="verbose" value="false"/>
+    </include>
+
+    <include file="$(find bluerov2_gazebo)/launch/start_pid_controller_demo.launch">
+        <arg name="teleop_on" value="true"/>
+    </include>
+
+    <!-- Re-visit this for custom Gazebo Plugin -->
+    <!-- <rosparam param="gazebo/models_bbox">
+        - 'oil_drum'
+        - 'rust_pipe'
+        - 'gas_tank'
+        - 'gas_cannister'
+    </rosparam> -->
+
+    <node pkg="osl_simulator" type="collate_bbox.py" name="collate_boxes"/>
+    <node pkg="osl_simulator" type="bounding_box.py" name="bbox_gt"/>
+    <!-- <node pkg="osl_simulator" type="predict.py" name="bbox_pred" respawn="true"/> -->
+</launch>

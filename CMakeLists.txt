@@ -18,6 +18,21 @@ find_package(catkin REQUIRED COMPONENTS
   vision_msgs
 )
 
+add_message_files(
+  FILES
+  BoundingBox.msg
+  Box2DArray.msg
+  Box3DArray.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  vision_msgs
+)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
