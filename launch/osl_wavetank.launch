@@ -4,8 +4,8 @@
     <arg name="extra_gazebo_args" default=""/>
 
     <arg name="yolo_predict" default="false"/>
-    <!-- <arg name="gt_save" dafault="false"/> -->
-    <!-- <arg name="gt_freq" dafault="5"/> -->
+    <arg name="gt_save" dafault="false"/>
+    <arg name="gt_freq" dafault="5"/>
 
     <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -33,6 +33,6 @@
     </rosparam> -->
 
     <node pkg="osl_simulator" type="collate_bbox.py" name="collate_boxes"/>
-    <!-- <node pkg="osl_simulator" type="bounding_box.py" name="bbox_gt" args="-S $(arg gt_save) -F $(arg gt_freq)"/> -->
+    <node pkg="osl_simulator" type="bounding_box.py" name="bbox_gt" args="-S $(arg gt_save) -F $(arg gt_freq)"/>
     <node pkg="osl_simulator" type="predict.py" name="bbox_pred" respawn="true" if="$(arg yolo_predict)"/>
 </launch>
