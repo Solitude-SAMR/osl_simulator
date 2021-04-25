@@ -5,6 +5,8 @@
     <arg name="gt_path"      default="$(find osl_network)/data/"/>
     <arg name="yolo_cfg"     default="$(find osl_network)/models/yolov3.cfg"/>
     <arg name="yolo_wts"     default="$(find osl_network)/models/yolov3.weights"/>
+    <arg name="world"        default="worlds/wavetank.world"/>
+    <!-- <arg name="world"        default="worlds/dataset.world"/> -->
 
     <!-- The save and freq param can be set later for enabling disabling the saving of data -->
     <param name="gt_save"  value="$(arg gt_save)"/>
@@ -15,9 +17,7 @@
 
     <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <!-- Edit the name of the world file (example_underwater.world) when using this template -->
-        <arg name="world_name"   value="worlds/wavetank.world"/>
-        <!-- <arg name="world_name"   value="worlds/dataset.world"/> -->
+        <arg name="world_name"   value="$(arg world)"/>
         <arg name="paused"       value="false"/>
         <arg name="use_sim_time" value="true"/>
         <arg name="gui"          value="true"/>
