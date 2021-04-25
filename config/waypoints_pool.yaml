@@ -1,0 +1,37 @@
+inertial_frame_id: world
+waypoints:
+  -
+    point: [0, 0, -2]
+    max_forward_speed: 0.4
+    heading: 0
+    use_fixed_heading: False
+  -
+    point: [5, 0, -2]
+    max_forward_speed: 0.4
+    heading: 0
+    use_fixed_heading: False
+  -
+    point: [5, 5, -2]
+    max_forward_speed: 0.4
+    heading: 0
+    use_fixed_heading: False
+  -
+    point: [-5, 5, -2]
+    max_forward_speed: 0.4
+    heading: 0
+    use_fixed_heading: False
+  -
+    point: [-5, -5, -2]
+    max_forward_speed: 0.4
+    heading: 0
+    use_fixed_heading: False
+  -
+    point: [5, -5, -2]
+    max_forward_speed: 0.4
+    heading: 0
+    use_fixed_heading: False
+  -
+    point: [0, 0, -2]
+    max_forward_speed: 0.4
+    heading: 0
+    use_fixed_heading: False

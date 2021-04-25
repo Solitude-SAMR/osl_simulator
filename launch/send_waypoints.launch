@@ -1,0 +1,11 @@
+<launch>
+    <arg name="uuv_name"  default="bluerov2"/>  
+    <arg name="waypoints" default="$(find osl_simulator)/config/waypoints_pool.yaml"/>  
+
+    <include file="$(find uuv_control_utils)/launch/send_waypoints_file.launch">
+        <arg name="uuv_name"     value="$(arg uuv_name)"/>
+        <arg name="filename"     value="$(arg waypoints)"/>
+        <arg name="start_time"   value="-1"/>
+        <arg name="interpolator" value="lipb"/>
+    </include>
+</launch>
