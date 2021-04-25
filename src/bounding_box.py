@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-import rospy 
+import rospy, tf 
 import numpy as np
 import cv2
-import tf
-import signal
+import signal, os
 
 from datetime import datetime
 from cv_bridge import CvBridge, CvBridgeError
@@ -53,8 +52,6 @@ class BoundingBox():
         self.model_states = [pose_template]*len(self.model_names)
         self.tf_listener = tf.TransformListener()
 
-        self.path_images = "/home/bvibhav/ros_uuv_ws/data/images/"
-        self.path_labels = "/home/bvibhav/ros_uuv_ws/data/labels/"
         self.file_classes = "/home/bvibhav/ros_uuv_ws/data/classes.txt"
         
         f_classes = open(self.file_classes, 'w')
@@ -67,8 +64,21 @@ class BoundingBox():
 
         # Labelled image publisher
         self.pub_img = rospy.Publisher("/bluerov2/bbox_gt", Image, queue_size=10)
+
+        self.gt_save = rospy.get_param("gt_save")
+        self.gt_freq = rospy.get_param("gt_freq")
+        self.gt_path = rospy.get_param("gt_path")+"images/"
     
+        # For using different frequency of saving than node frequency. 
+        # Used to manage display and save separately. 
+        self.prev_save_time = rospy.get_time()
+
+        # Create the output path if it does not exist. 
+        if not os.path.exists(self.gt_path):
+            os.makedirs(self.gt_path)
+
     def quit_script(self):
+        # To be used in case of destructors
         exit()
 
     def signal_handler(self, sig, frame):
@@ -85,10 +95,27 @@ class BoundingBox():
     def callback_camera(self, msg_img):
         self.img = self.cv_bridge.imgmsg_to_cv2(msg_img, "bgr8")
 
+    def save_groundtruth(self, det_strings):
+        # Generate output name from system time
+        output_name = datetime.now().strftime('%s_%f')
+
+        # Output image and label file paths
+        output_image = self.gt_path+output_name+'.png'
+        output_label = self.gt_path+output_name+'.txt'
+        
+        # Write the image and labels
+        print("Saving image and labels:", output_name)
+        cv2.imwrite(output_image, self.img.copy())
+        f_labels = open(output_label, 'w')
+        for c_string in det_strings:
+            f_labels.write("%s\n" % c_string)
+        f_labels.close()
+
     def process(self, show_img=False):
         self.img_bbox = self.img.copy()
         height, width, _ = self.img_bbox.shape
 
+        # For getting model position with respect the camera. 
         mat_states = np.zeros((4, len(self.model_states)))
         mat_states[3,:] = 1
         for k in range(0, len(self.model_states)):
@@ -102,6 +129,9 @@ class BoundingBox():
         det_strings = []
         for c_box, c_name in zip(self.msg_bbox.boxes, self.msg_bbox.name):
             idx = self.model_names.index(c_name)
+
+            # Check if the model is in front of the camera.
+            # TODO: Replace with camera FOV instead
             if mat_states[0,idx]<0:
                 continue
 
@@ -123,31 +153,35 @@ class BoundingBox():
             prev_area = size_x*size_y            
             new_area = (maxx - minx)*(maxy - miny)
 
-            if center_x<0 or center_y<0:              continue 
-            if center_x>width or center_y>height:     continue 
-            if (float(new_area)/float(prev_area))<.4: continue
+            # NOTE: Hard code fix for model 'rust_pipe'. Avoid area for this. 
+            if c_name=="rust_pipe" and (new_area>.9*width*height):
+                continue
 
-            self.img_bbox = cv2.rectangle(self.img_bbox,(minx,miny),(maxx,maxy),(0,127,0),2)
+            if center_x<-.5*width or center_y<-.5*height: continue 
+            if center_x>1.5*width or center_y>1.5*height: continue
+            if (float(new_area)/float(prev_area))<.1 and not c_name=="rust_pipe": 
+                continue
+
+            # print c_name[:4], mat_states[:,idx]
+            self.img_bbox = cv2.rectangle(self.img_bbox,( minx,miny),(maxx,maxy),(0,127,0),2)
             det_strings.append("%d %.4f %.4f %.4f %.4f" % (idx, center_x/width, center_y/height, size_x/width, size_y/height))
             # print height, width
 
+        # For saving images manually using OpenCV interface.  
         if show_img:
             cv2.imshow('Image', self.img_bbox)
             key = cv2.waitKey(1)
             if key==ord('s'):
-                output_name = datetime.now().strftime('%s_%f')
-                output_image = self.path_images+output_name+'.png'
-                output_label = self.path_labels+output_name+'.txt'
-                print("Saving image and labels:", output_name)
-
-                cv2.imwrite(output_image, self.img.copy())
-                f_labels = open(output_label, 'w')
-                for c_string in det_strings:
-                    f_labels.write("%s\n" % c_string)
-                f_labels.close()
-
+                self.save_groundtruth(det_strings)
             elif key==ord('q') or key==27:
                 self.quit_script()
+
+        # Store the image and labels
+        FLAG_SAVE = rospy.get_param("gt_save")
+        FLAG_FREQ = (rospy.get_time() - self.prev_save_time) > 1.0/self.gt_freq
+        if FLAG_SAVE and FLAG_FREQ and len(det_strings)>0:
+            self.prev_save_time = rospy.get_time()
+            self.save_groundtruth(det_strings)
 
 def main():
     rospy.init_node('bounding_box')

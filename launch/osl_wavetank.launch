@@ -1,38 +1,36 @@
 <launch>
-    <arg name="gui" default="true"/>
-    <arg name="paused" default="false"/>
-    <arg name="extra_gazebo_args" default=""/>
-
     <arg name="yolo_predict" default="false"/>
-    <arg name="gt_save" dafault="false"/>
-    <arg name="gt_freq" dafault="5"/>
+    <arg name="gt_save"      default="false"/>
+    <arg name="gt_freq"      default="3"/>
+    <arg name="gt_path"      default="$(find osl_network)/data/"/>
+    <arg name="yolo_cfg"     default="$(find osl_network)/models/yolov3.cfg"/>
+    <arg name="yolo_wts"     default="$(find osl_network)/models/yolov3.weights"/>
+
+    <!-- The save and freq param can be set later for enabling disabling the saving of data -->
+    <param name="gt_save"  value="$(arg gt_save)"/>
+    <param name="gt_freq"  value="$(arg gt_freq)"/>
+    <param name="gt_path"  value="$(arg gt_path)"/>
+    <param name="yolo_cfg" value="$(arg yolo_cfg)"/>
+    <param name="yolo_wts" value="$(arg yolo_wts)"/>
 
     <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <!-- Edit the name of the world file (example_underwater.world) when using this template -->
-        <arg name="world_name" value="worlds/wavetank.world"/>
-        <!-- <arg name="world_name" value="worlds/dataset.world"/> -->
-        <arg name="paused" value="$(arg paused)"/>
+        <arg name="world_name"   value="worlds/wavetank.world"/>
+        <!-- <arg name="world_name"   value="worlds/dataset.world"/> -->
+        <arg name="paused"       value="false"/>
         <arg name="use_sim_time" value="true"/>
-        <arg name="gui" value="$(arg gui)"/>
-        <arg name="headless" value="false"/>
-        <arg name="debug" value="false"/>
-        <arg name="verbose" value="false"/>
+        <arg name="gui"          value="true"/>
+        <arg name="headless"     value="false"/>
+        <arg name="debug"        value="false"/>
+        <arg name="verbose"      value="false"/>
     </include>
 
     <include file="$(find bluerov2_gazebo)/launch/start_pid_controller_demo.launch">
         <arg name="teleop_on" value="true"/>
     </include>
 
-    <!-- Re-visit this for custom Gazebo Plugin -->
-    <!-- <rosparam param="gazebo/models_bbox">
-        - 'oil_drum'
-        - 'rust_pipe'
-        - 'gas_tank'
-        - 'gas_cannister'
-    </rosparam> -->
-
     <node pkg="osl_simulator" type="collate_bbox.py" name="collate_boxes"/>
-    <node pkg="osl_simulator" type="bounding_box.py" name="bbox_gt" args="-S $(arg gt_save) -F $(arg gt_freq)"/>
-    <node pkg="osl_simulator" type="predict.py" name="bbox_pred" respawn="true" if="$(arg yolo_predict)"/>
+    <node pkg="osl_simulator" type="bounding_box.py" name="bbox_gt" output="screen"/>
+    <!-- <node pkg="osl_predict" type="yolo_predict.py" name="bbox_pred" respawn="true" if="$(arg yolo_predict)"/> -->
 </launch>
