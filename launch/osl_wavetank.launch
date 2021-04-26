@@ -1,19 +1,25 @@
 <launch>
-    <arg name="yolo_predict" default="false"/>
+    <arg name="world"        default="worlds/wavetank.world"/>
+    <!-- <arg name="world"        default="worlds/dataset.world"/> -->
+
+    <!-- Groundtruth/Gazebo bbox related params -->
     <arg name="gt_save"      default="false"/>
     <arg name="gt_freq"      default="3"/>
     <arg name="gt_path"      default="$(find osl_network)/data/"/>
-    <arg name="yolo_cfg"     default="$(find osl_network)/models/yolov3.cfg"/>
-    <arg name="yolo_wts"     default="$(find osl_network)/models/yolov3.weights"/>
-    <arg name="world"        default="worlds/wavetank.world"/>
-    <!-- <arg name="world"        default="worlds/dataset.world"/> -->
+
+    <!-- Yolo related params -->
+    <arg name="yolo_predict" default="false"/>
+    <arg name="yolo_network" default="$(find osl_network)/models/yolov3.cfg"/>
+    <arg name="yolo_weights" default="$(find osl_network)/models/yolov3_200415.weights"/>
+    <arg name="yolo_classes" default="$(find osl_network)/data/classes.txt"/>
 
     <!-- The save and freq param can be set later for enabling disabling the saving of data -->
     <param name="gt_save"  value="$(arg gt_save)"/>
     <param name="gt_freq"  value="$(arg gt_freq)"/>
     <param name="gt_path"  value="$(arg gt_path)"/>
-    <param name="yolo_cfg" value="$(arg yolo_cfg)"/>
-    <param name="yolo_wts" value="$(arg yolo_wts)"/>
+    <param name="yolo_network" value="$(arg yolo_network)"/>
+    <param name="yolo_weights" value="$(arg yolo_weights)"/>
+    <param name="yolo_classes" value="$(arg yolo_classes)"/>
 
     <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -32,5 +38,5 @@
 
     <node pkg="osl_simulator" type="collate_bbox.py" name="collate_boxes"/>
     <node pkg="osl_simulator" type="bounding_box.py" name="bbox_gt" output="screen"/>
-    <!-- <node pkg="osl_predict" type="yolo_predict.py" name="bbox_pred" respawn="true" if="$(arg yolo_predict)"/> -->
+    <node pkg="osl_network" type="yolo_predict.py" name="bbox_pred" respawn="true" if="$(arg yolo_predict)"/>
 </launch>

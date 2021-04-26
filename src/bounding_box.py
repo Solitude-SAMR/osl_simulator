@@ -52,13 +52,6 @@ class BoundingBox():
         self.model_states = [pose_template]*len(self.model_names)
         self.tf_listener = tf.TransformListener()
 
-        self.file_classes = "/home/bvibhav/ros_uuv_ws/data/classes.txt"
-        
-        f_classes = open(self.file_classes, 'w')
-        for c_name in self.model_names:
-            f_classes.write("%s\n" % c_name)
-        f_classes.close()
-
         # Ctrl handler
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -76,6 +69,13 @@ class BoundingBox():
         # Create the output path if it does not exist. 
         if not os.path.exists(self.gt_path):
             os.makedirs(self.gt_path)
+
+        self.file_classes = rospy.get_param("gt_path")+"classes.txt"
+        
+        f_classes = open(self.file_classes, 'w')
+        for c_name in self.model_names:
+            f_classes.write("%s\n" % c_name)
+        f_classes.close()
 
     def quit_script(self):
         # To be used in case of destructors
