@@ -1,3 +1,5 @@
+config/waypoints.yaml
+
 devel/
 logs/
 build/
