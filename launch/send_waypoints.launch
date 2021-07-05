@@ -1,8 +1,8 @@
 <launch>
     <arg name="uuv_name"    default="bluerov2"/>
     <arg name="path_points" default="$(find osl_simulator)/config"/>
-    <arg name="waypoints"   default="$(arg path_points)/waypoints.yaml"/>  
-    <!-- <arg name="waypoints"   default="$(arg path_points)/waypoints_tank.yaml"/>   -->
+    <!-- <arg name="waypoints"   default="$(arg path_points)/waypoints.yaml"/>   -->
+    <arg name="waypoints"   default="$(arg path_points)/waypoints_tank.yaml"/>  
     <!-- <arg name="waypoints"   default="$(arg path_points)/waypoints_pool.yaml"/>   -->
 
     <include file="$(find uuv_control_utils)/launch/send_waypoints_file.launch">
