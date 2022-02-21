@@ -32,29 +32,9 @@
         <arg name="verbose"      value="false"/>
     </include>
 
-    <!-- <include file="$(find bluerov2_gazebo)/launch/start_pid_controller_demo.launch">
+    <include file="$(find bluerov2_gazebo)/launch/start_pid_controller_demo.launch">
         <arg name="teleop_on" value="true"/>
-    </include> -->
-
-    <!-- Add the bluerov2 vehicle to the world simulation (namespace: bluerov2) -->
-    <include file="$(find bluerov2_description)/launch/upload_bluerov2.launch">
-        <arg name="namespace" value="bluerov2"/>
-        <arg name="x" value="0"/>
-        <arg name="y" value="0"/>
-        <arg name="z" value="-.3"/>
-        <arg name="yaw" value="0"/>
-    <!-- <arg name="use_ned_frame" value="$(arg use_ned_frame)"/> -->
     </include>
-    <!-- <include file="$(find bluerov2_control)/launch/start_thruster_manager.launch"/> -->
-
-    <group ns="/bluerov2/">
-        <node name="bluerov2_odom_gt" pkg="osl_rlearning" type="bluerov2_pose.py" respawn="true" output="screen"/>
-        <node name="bluerov2_control" pkg="osl_rlearning" type="bluerov2_control.py" respawn="true" output="screen"/>
-        <node name="bluerov2_thrusters" pkg="osl_rlearning" type="bluerov2_thrusters.py" respawn="true" output="screen"/>
-        <node name="bluerov2_dvl_fixed" pkg="osl_rlearning" type="bluerov2_dvl_sim.py" output="screen"/>
-    </group>
-
-    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find bluerov2_control)/rviz/bluerov2_control.rviz"/>
 
     <!-- <node pkg="osl_simulator" type="collate_bbox.py" name="collate_boxes"/> -->
     <!-- <node pkg="osl_simulator" type="bounding_box.py" name="bbox_gt" output="screen"/> -->
